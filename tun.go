@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -17,13 +16,16 @@ var (
 )
 
 func init() {
+	log.SetFlags(0)
+	log.SetOutput(os.Stderr)
+	//
 	flag.IntVar(&port, "p", 5051, "a port used by the server")
 	flag.BoolVar(&verbose, "v", false, "be verbosive")
 	flag.Usage = func() {
 		name := os.Args[0]
-		fmt.Fprintf(os.Stderr, "Usage: %s [option] <dir>\n", name)
-		fmt.Fprintf(os.Stderr, "Spawns an http server that serves files from the specified directory.\n")
-		fmt.Fprintf(os.Stderr, "\nOPTIONS:\n")
+		log.Printf("Usage: %s [option] <dir>", name)
+		log.Println("Spawns an http server that serves files from the specified directory.")
+		log.Println("\nOPTIONS:")
 		flag.PrintDefaults()
 	}
 }
@@ -32,7 +34,7 @@ func main() {
 	flag.Parse()
 	if len(flag.Args()) < 1 {
 		flag.Usage()
-		os.Exit(-1)
+		os.Exit(1)
 	}
 	port := strconv.Itoa(port)
 	dir := flag.Arg(0)
@@ -43,9 +45,9 @@ func main() {
 	}
 	if verbose {
 		if ip, err := getIP(); err != nil {
-			log.Fatalln("unable to list entrypoints:", err)
+			log.Println("unable to list entrypoints:", err)
 		} else {
-			println("entrypoint:", "http://"+ip.String()+":"+port)
+			log.Println("entrypoint:", "http://"+ip.String()+":"+port)
 		}
 	}
 	http.Handle("/", http.FileServer(http.Dir(dir)))
