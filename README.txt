@@ -1,6 +1,7 @@
-Usage: ./tun [option] <dir>
-Spawns an http server that serves files from the specified directory.
+Usage: tun [option] <dir|url>
+Spawns an http server that serves files from the specified directory or URL.
 
 OPTIONS:
-  -p=5051: a port used by the server
-  -v=false: be verbosive
+  -p, --port=5051        a port used by the server
+  -u, --url=false        take an url as source
+  -v, --verbose=false    be verbosive
