@@ -23,8 +23,8 @@ var (
 )
 
 var (
-	pin   string
-	bhash []byte
+	pin     string
+	pinHash []byte
 )
 
 func init() {
@@ -57,7 +57,7 @@ func main() {
 		if hash, err := bcrypt.GenerateFromPassword([]byte(pin), bcrypt.DefaultCost); err != nil {
 			panic(err)
 		} else {
-			bhash = hash
+			pinHash = hash
 		}
 	}
 	if useURL {
@@ -70,9 +70,7 @@ func main() {
 			uri.Scheme = "http"
 		}
 		http.Handle("/", http.HandlerFunc(
-			authHandler(
-				proxyHandler(uri),
-			),
+			authHandler(pinHash, proxyHandler(uri)),
 		))
 	} else {
 		dir := mflag.Arg(0)
@@ -82,11 +80,9 @@ func main() {
 			fatalf("stat %s: not a directory", dir)
 		}
 		http.Handle("/", http.HandlerFunc(
-			authHandler(
-				http.FileServer(
-					http.Dir(dir),
-				),
-			),
+			authHandler(pinHash, http.FileServer(
+				http.Dir(dir),
+			)),
 		))
 	}
 	if verbose {
@@ -119,8 +115,12 @@ func getIP() (addr net.IP, err error) {
 	return nil, errors.New("no public ip found")
 }
 
-func authHandler(h http.Handler) http.HandlerFunc {
+func authHandler(pinHash []byte, h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if len(pinHash) == 0 {
+			h.ServeHTTP(w, r)
+			return
+		}
 		prompt := `Basic realm="Enter the PIN"`
 		_, pass, ok := r.BasicAuth()
 		if !ok {
@@ -128,7 +128,7 @@ func authHandler(h http.Handler) http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		if err := bcrypt.CompareHashAndPassword(bhash, []byte(pass)); err != nil {
+		if err := bcrypt.CompareHashAndPassword(pinHash, []byte(pass)); err != nil {
 			w.Header().Set("WWW-Authenticate", prompt)
 			http.Error(w, "unauthorized: invalid PIN or no PIN provided", http.StatusUnauthorized)
 			return
