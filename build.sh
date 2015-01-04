@@ -11,7 +11,7 @@ DOCKOUT=$WORKDIR/docker
 exit 0
 
 # build the docker image
-cp $WORKDIR/Dockerfile $DOCKOUT/Dockerfile
+cp $WORKDIR/Dockerfile.buildsh $DOCKOUT/Dockerfile
 docker build -t xlab/$EXEC $DOCKOUT
 # save docker image as tar archive
 docker save -o $DOCKOUT/$EXEC.tar xlab/$EXEC
