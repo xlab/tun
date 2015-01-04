@@ -1,5 +1,5 @@
 Usage: tun [option] <dir|url>
-Spawns an http server that serves files from the specified directory or URL.
+Spawns an http server that serves files from the specified directory or a web resource.
 
 OPTIONS:
   -p, --port=5051        a port used by the server

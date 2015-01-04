@@ -36,7 +36,7 @@ func init() {
 	mflag.BoolVar(&verbose, []string{"v", "-verbose"}, false, "be verbose")
 	mflag.Usage = func() {
 		errorf("Usage: %s [option] <dir|url>\n", os.Args[0])
-		errorln("Spawns an http server that serves files from the specified directory or URL.")
+		errorln("Spawns an http server that serves files from the specified directory or a web resource.")
 		errorln("\nOPTIONS:")
 		mflag.PrintDefaults()
 	}
